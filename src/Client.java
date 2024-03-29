@@ -50,7 +50,7 @@ public class Client {
     }
     private void connecting(){
         joinGroup();
-        //reading.start();
+        reading.start();
         writing.start();
     }
 
@@ -69,7 +69,7 @@ public class Client {
             buffer = message.getBytes();
             DatagramPacket packetSend = new DatagramPacket(buffer, buffer.length, ip, Constants.PORT);
             socket.send(packetSend);
-            log("Message Sent to servert");
+            log("Message Sent to server");
         } catch (IOException e){
             log("send : " + e);
         }

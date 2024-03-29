@@ -3,13 +3,16 @@ import java.net.*;
 import java.util.Scanner;
 
 public class Server {
-    static MulticastSocket socket = null;
-    static byte[] buffer = null;
+    public static MulticastSocket socket;
+    static byte[] buffer;
     DatagramSocket receivePacket = null;
     static DatagramPacket packet = null;
     static Scanner scan = null;
     Thread write = new Thread(Server::sendToClient);
     Thread read = new Thread(Server::readFromClient);
+
+    ClientServer[] clientList;
+
     public static void main(String[] args){
         Server server = new Server();
         server.initializeVariable();
@@ -27,17 +30,6 @@ public class Server {
     }
     private static String readFromKeyboard(){
         return scan.nextLine();
-    }
-    private static void send(String message) {
-        try{
-            InetAddress ip = InetAddress.getByName(Constants.IP);
-            buffer = message.getBytes();
-            DatagramPacket packetSend = new DatagramPacket(buffer, buffer.length, ip, Constants.PORT);
-            socket.send(packetSend);
-            log("Message Sent");
-        } catch (IOException e){
-            log("send : " + e);
-        }
     }
     private void connecting(){
         write.start();
