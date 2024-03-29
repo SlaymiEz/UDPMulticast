@@ -3,10 +3,13 @@ import java.net.*;
 import java.util.Scanner;
 
 public class Server {
-    MulticastSocket socket = null;
-    byte[] buffer = null;
+    static MulticastSocket socket = null;
+    static byte[] buffer = null;
     DatagramSocket receivePacket = null;
-    Scanner scan = null;
+    static DatagramPacket packet = null;
+    static Scanner scan = null;
+    Thread write = new Thread(Server::sendToClient);
+    Thread read = new Thread(Server::readFromClient);
     public static void main(String[] args){
         Server server = new Server();
         server.initializeVariable();
@@ -18,18 +21,14 @@ public class Server {
             buffer = new byte[Constants.BUFFER_SIZE];
             scan = new Scanner(System.in);
             log("Server Running...");
-        } catch (SocketException e){
-            log("initializeVariable : " + e.toString());
-        }
-        catch (IOException e){
-            log("initializeVariable : " + e.toString());
+        } catch (IOException e){
+            log("initializeVariable : " + e);
         }
     }
-    private String readFromKeyboard(){
-        String line = scan.nextLine();
-        return line;
+    private static String readFromKeyboard(){
+        return scan.nextLine();
     }
-    private void send(String message) {
+    private static void send(String message) {
         try{
             InetAddress ip = InetAddress.getByName(Constants.IP);
             buffer = message.getBytes();
@@ -37,17 +36,40 @@ public class Server {
             socket.send(packetSend);
             log("Message Sent");
         } catch (IOException e){
-            log("send : " + e.toString());
+            log("send : " + e);
         }
     }
     private void connecting(){
+        write.start();
+        log("Started the write thread");
+        read.start();
+        log("Started the read thread");
+    }
+
+    private static void sendToClient(){
         while (true){
             String data = readFromKeyboard();
             send(data);
             buffer = new byte[Constants.BUFFER_SIZE];
         }
     }
-    public void log(String message){
+    private static String receiveData(){
+        String line = "";
+        try {
+            packet = new DatagramPacket(buffer, buffer.length);
+            socket.receive(packet);
+            line = new String(packet.getData(),0, packet.getLength());
+
+        }catch (IOException e){
+            log("receiveData : " + e);
+        }
+        return line;
+    }
+    private static void readFromClient(){
+        String line = receiveData();
+        log("Server Received : " + line);
+    }
+    public static void log(String message){
         System.out.println(message);
     }
 }
