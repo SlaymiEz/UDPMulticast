@@ -2,28 +2,36 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.SocketException;
 import java.util.Scanner;
 
 public class Client {
     static MulticastSocket socket = null;
-    static byte[] buffer = null;
     static DatagramPacket packet = null;
     InetAddress ip = null;
     Thread reading = new Thread(Client::readFromServer);
     Thread writing = new Thread(Client::sendToServer);
     static Scanner scan = null;
+
+    public static String IPbyInt;
     public static void main(String[] args){
+        if(args.length == 1){
+            IPbyInt = args[0];
+        } else {
+            System.out.println("You need to put the server's ip address into the program argument");
+            System.exit(-1);
+        }
+
         Client client = new Client();
         client.initializeVariable();
         client.connecting();
+
     }
     private void initializeVariable(){
         try{
-            socket = new MulticastSocket(Constants.PORT);
-            ip = InetAddress.getByName(Constants.IP);
-            buffer = new byte[Constants.BUFFER_SIZE];
+            socket = new MulticastSocket(Common.PORT);
+            ip = InetAddress.getByName(Common.IP);
             scan = new Scanner(System.in);
+
         } catch (IOException e) {
             log("initializeVariable : " + e);
         }
@@ -31,6 +39,7 @@ public class Client {
     private static String receiveData(){
         String line = "";
         try {
+            byte[] buffer = new byte[Common.BUFFER_SIZE];
             packet = new DatagramPacket(buffer, buffer.length);
             socket.receive(packet);
             line = new String(packet.getData(),0, packet.getLength());
@@ -44,6 +53,7 @@ public class Client {
         try {
             socket.joinGroup(ip);
             log("Client Running...");
+            send("connection");
         } catch (IOException e) {
             log("joinGroup : " + e);
         }
@@ -65,9 +75,11 @@ public class Client {
     }
     private static void send(String message) {
         try{
-            InetAddress ip = InetAddress.getByName(Constants.IP);
+            byte[] buffer;
+            InetAddress ip = InetAddress.getByName(IPbyInt);
             buffer = message.getBytes();
-            DatagramPacket packetSend = new DatagramPacket(buffer, buffer.length, ip, Constants.PORT);
+            System.out.println(IPbyInt + " " + ip);
+            DatagramPacket packetSend = new DatagramPacket(buffer, buffer.length, ip, Common.PORT);
             socket.send(packetSend);
             log("Message Sent to server");
         } catch (IOException e){
@@ -78,7 +90,6 @@ public class Client {
         while (true){
             String data = readFromKeyboard();
             send(data);
-            buffer = new byte[Constants.BUFFER_SIZE];
         }
     }
     private static void log(String message){
