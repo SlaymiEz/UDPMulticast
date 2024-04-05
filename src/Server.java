@@ -8,7 +8,6 @@ public class Server {
     DatagramSocket receivePacket = null;
     static Scanner scan = null;
     Thread write = new Thread(Server::sendToClient);
-    Thread read = new Thread(Server::readFromClient);
 
     public static ArrayList<ClientServer> clientList;
 
@@ -32,7 +31,6 @@ public class Server {
     private void connecting(){
         write.start();
         log("Started the write thread");
-        read.start();
         log("Started the read thread");
     }
 
@@ -43,25 +41,7 @@ public class Server {
         }
     }
     private static String receiveData(){
-        String line = "";
-        try {
-            byte[] buffer = new byte[Common.BUFFER_SIZE];
-            DatagramPacket packet;
-            packet = new DatagramPacket(buffer, buffer.length);
-            System.out.println("gg1 " + socket.getInetAddress().toString());
-            socket.receive(packet);
-            System.out.println("gg2");
-            line = new String(packet.getData(),0, packet.getLength());
-
-            if(line.equals("connection")){
-                System.out.println("A client connected");
-                clientList.add(new ClientServer(packet.getAddress().getAddress()));
-            }
-
-        }catch (IOException e){
-            log("receiveData : " + e);
-        }
-        return line;
+        return "44";
     }
     private static void readFromClient(){
         String line = receiveData();
