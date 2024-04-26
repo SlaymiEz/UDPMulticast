@@ -12,9 +12,10 @@ public class ClientServer {
     InetAddress IP;
     MulticastSocket socket;
     Thread readThread;
+    Server serverInstance;
 
     List<byte[]> data = new ArrayList<>();
-    public ClientServer(InetAddress IP, MulticastSocket socket    /**to do : Client type**/){
+    public ClientServer(InetAddress IP, MulticastSocket socket, Server server    /**to do : Client type**/){
         this.IP = IP;
         readThread = new Thread(readThread);
     }
@@ -22,7 +23,7 @@ public class ClientServer {
     public void sentMessage(String message){
             byte[] buffer;
         try{
-            InetAddress ip = InetAddress.getByName(Common.IP);
+            InetAddress ip = IP;
             buffer = message.getBytes();
             DatagramPacket packetSend = new DatagramPacket(buffer, buffer.length, ip, Common.PORT);
             Server.socket.send(packetSend);

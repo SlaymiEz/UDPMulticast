@@ -23,9 +23,10 @@ public class Server {
                 System.out.println("wait for a connection");
                 socket.receive(packet);
                 String[] wordList = new String(packet.getData()).split(" ", 1000);
-
+                System.out.println(wordList.length + " " + wordList[0] + " " + Integer.getInteger(wordList[1]));
                 if(wordList.length == 2 && wordList[0] == "connexion" && Integer.getInteger(wordList[1]) >= 0){
                     System.out.println("Got a new connexion from : " + packet.getAddress());
+                    //clientList.add()
                 }
             } catch (IOException e) {
                 log("receiveData : " + e);
@@ -41,7 +42,9 @@ public class Server {
     private void initializeVariable(){
         isRunning = true;
         try {
+            InetAddress group = InetAddress.getByName("230.0.0.1");
             socket = new MulticastSocket(Common.PORT);
+            socket.joinGroup(group);
             scan = new Scanner(System.in);
             log("Server Running...");
         } catch (IOException e){

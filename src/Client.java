@@ -7,7 +7,6 @@ import java.util.Scanner;
 public class Client {
     static MulticastSocket socket = null;
     static DatagramPacket packet = null;
-    InetAddress ip = null;
     Thread reading = new Thread(Client::readFromServer);
     Thread writing = new Thread(Client::sendToServer);
     static Scanner scan = null;
@@ -29,7 +28,6 @@ public class Client {
     private void initializeVariable(){
         try{
             socket = new MulticastSocket(Common.PORT);
-            ip = InetAddress.getByName(Common.IP);
             scan = new Scanner(System.in);
 
         } catch (IOException e) {
@@ -51,7 +49,7 @@ public class Client {
     }
     private void joinGroup(){
         try {
-            socket.joinGroup(ip);
+            socket.joinGroup(InetAddress.getByName(IPbyInt));
             log("Client Running...");
             send("connection");
         } catch (IOException e) {
