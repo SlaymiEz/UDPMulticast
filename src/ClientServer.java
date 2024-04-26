@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.rmi.server.LogStream.log;
 
 public class ClientServer {
     InetAddress IP;
@@ -27,9 +26,9 @@ public class ClientServer {
             buffer = message.getBytes();
             DatagramPacket packetSend = new DatagramPacket(buffer, buffer.length, ip, Common.PORT);
             Server.socket.send(packetSend);
-            log("Message Sent");
+            System.out.println("Message Sent");
         } catch (IOException e){
-            log("send : " + e);
+            System.out.println("send : " + e);
         }
     }
 
@@ -46,7 +45,7 @@ public class ClientServer {
 
              data.add(1, line.getBytes());
         }catch (IOException e){
-            log("receiveData : " + e);
+            System.out.println("receiveData : " + e);
         }
     }
 

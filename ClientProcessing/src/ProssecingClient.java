@@ -76,7 +76,7 @@ public void mouseMoved() {
     data[2] = (byte) pmouseX;
     data[3] = (byte) pmouseY;
 
-    // by default if the ip address and the port number are not specified, UDP 
+    // by default if the ip address and the port n20:43umber are not specified, UDP
     // send the message to the joined group address and the current socket port.
     udp.send( data ); // = send( data, group_ip, port );
 

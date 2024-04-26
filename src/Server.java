@@ -3,13 +3,35 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+
 public class Server {
     public static MulticastSocket socket;
     DatagramSocket receivePacket = null;
     static Scanner scan = null;
-    Thread write = new Thread(Server::sendToClient);
+    Thread write = new Thread(Server::sendGlobalMessageFromKeyboard);
+    Thread waitforconnection = new Thread(Server::waitforconnection);
+    static boolean isRunning;
 
     public static ArrayList<ClientServer> clientList;
+
+
+    private static void waitforconnection() {
+        while (isRunning) {
+            try {
+                byte[] buffer = new byte[Common.BUFFER_SIZE];
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                System.out.println("wait for a connection");
+                socket.receive(packet);
+                String[] wordList = new String(packet.getData()).split(" ", 1000);
+
+                if(wordList.length == 2 && wordList[0] == "connexion" && Integer.getInteger(wordList[1]) >= 0){
+                    System.out.println("Got a new connexion from : " + packet.getAddress());
+                }
+            } catch (IOException e) {
+                log("receiveData : " + e);
+            }
+        }
+    }
 
     public static void main(String[] args){
         Server server = new Server();
@@ -17,6 +39,7 @@ public class Server {
         server.connecting();
     }
     private void initializeVariable(){
+        isRunning = true;
         try {
             socket = new MulticastSocket(Common.PORT);
             scan = new Scanner(System.in);
@@ -30,23 +53,20 @@ public class Server {
     }
     private void connecting(){
         write.start();
+        waitforconnection.start();
         log("Started the write thread");
         log("Started the read thread");
     }
 
-    private static void sendToClient(){
+    private static void sendGlobalMessageFromKeyboard(){
         while (true){
             String data = readFromKeyboard();
-            //to do impletment sending packet
+            for(int i = 0; i >= clientList.size(); i++){
+                clientList.get(i).sentMessage(data);
+            }
         }
     }
-    private static String receiveData(){
-        return "44";
-    }
-    private static void readFromClient(){
-        String line = receiveData();
-        log("Server Received : " + line);
-    }
+
     public static void log(String message){
         System.out.println(message);
     }
